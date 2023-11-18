@@ -89,5 +89,5 @@ def delete_picture(id):
         return {"message": "picture not found"}, 404
     else:
         data.pop(next((i for i, item in enumerate(data) if item['id'] == id), None))
-        return {} 204
+        return {}, 204
 
