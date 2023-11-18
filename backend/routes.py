@@ -35,7 +35,7 @@ def count():
 ######################################################################
 @app.route("/picture", methods=["GET"])
 def get_pictures():
-    pass
+    return jsonify(data), 200
 
 ######################################################################
 # GET A PICTURE
@@ -44,7 +44,8 @@ def get_pictures():
 
 @app.route("/picture/<int:id>", methods=["GET"])
 def get_picture_by_id(id):
-    pass
+    pic = next((item for item in data if item['id'] == id), None)
+    return (jsonify(None), 404) if pic is None else (jsonify(pic), 200)
 
 
 ######################################################################
@@ -52,7 +53,13 @@ def get_picture_by_id(id):
 ######################################################################
 @app.route("/picture", methods=["POST"])
 def create_picture():
-    pass
+    newpic = request.get_json()
+    if next((item for item in data if item['id'] == newpic['id']), None) is not None:
+        return {"Message": f"picture with id {newpic['id']} already present"}, 302
+    else:
+        data.append(newpic)
+        
+    return jsonify(newpic), 201
 
 ######################################################################
 # UPDATE A PICTURE
@@ -61,11 +68,26 @@ def create_picture():
 
 @app.route("/picture/<int:id>", methods=["PUT"])
 def update_picture(id):
-    pass
+    uppic = request.get_json()
+    if next((item for item in data if item['id'] == uppic['id']), None) is not None:
+        for item in data:
+            if item['id'] == uppic['id']:
+                item.update(uppic)
+                return {"Message": "updated"}, 200
+    else:
+        return {"message": "picture not found"}, 404
+
 
 ######################################################################
 # DELETE A PICTURE
 ######################################################################
 @app.route("/picture/<int:id>", methods=["DELETE"])
 def delete_picture(id):
-    pass
+    index = next((i for i, item in enumerate(data) if item['id'] == id), None)
+
+    if index is None:
+        return {"message": "picture not found"}, 404
+    else:
+        data.pop(next((i for i, item in enumerate(data) if item['id'] == id), None))
+        return {} 204
+
